@@ -9,7 +9,9 @@ from bs4 import BeautifulSoup
 import requests
 import pymongo
 from splinter import Browser
-
+import re
+import time
+import pandas as pd
 
 def scrape():
         mars={}
@@ -51,15 +53,15 @@ def scrape():
         # In[7]:
 
 
-        featured_mars_image=Browser("chrome", headless=False)
+        browser=Browser("chrome", headless=False)
         mars_url="https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
-        featured_mars_image.visit(mars_url)
-
+        browser.visit(mars_url)
+        time.sleep(5)
 
         # In[8]:
 
 
-        mars_images_html = featured_mars_image.html
+        mars_images_html = browser.html
         mars_soup = BeautifulSoup(mars_images_html, 'html.parser')
 
 
@@ -73,7 +75,7 @@ def scrape():
         # In[10]:
 
 
-        import re
+        
 
         # text = 'gfgfdAAA1234ZZZuijjk'
 
@@ -105,10 +107,11 @@ def scrape():
 
 
         url = "https://twitter.com/marswxreport?lang=en"
+        browser.visit(url)
+        html=browser.html
+        # response = requests.get(url)
 
-        response = requests.get(url)
-
-        soup = BeautifulSoup(response.text, 'lxml')
+        soup = BeautifulSoup(html, 'html.parser')
 
 
         # In[25]:
@@ -148,39 +151,42 @@ def scrape():
         # In[16]:
 
 
-        import pandas as pd
-        facts=soup.find("tbody")
-        table_rows=facts.find_all("tr")
-
-        l = []
-        for tr in table_rows:
-                td = tr.find_all('td')
-                row = [tr.text for tr in td]
-                l.append(row)
-                mars_table=pd.DataFrame(l, columns=["Category","Statistic"])
-                mars_table
-
         
-        # In[17]:
+        # facts=soup.find("tbody")
+        # table_rows=facts.find_all("tr")
+
+        # l = []
+        # for tr in table_rows:
+        #         td = tr.find_all('td')
+        #         row = [tr.text for tr in td]
+        #         l.append(row)
+        #         mars_table=pd.DataFrame(l, columns=["Category","Statistic"])
+        #         mars_table
+        # mars_table.set_index("Category", inplace=True)
+        
+        # # In[17]:
 
 
-        mars_html_table=mars_table.to_html()
-        print(mars_html_table)
-        mars["mars_html_table"]=mars_html_table
-        mars["mars_table"]=mars_table
+        # mars_html_table=mars_table.to_html()
+        # print(mars_html_table)
+        # mars["mars_html_table"]=mars_html_table
+        # mars["mars_table"]=mars_table
+
+        # day 2 activtiy 9, week 15
+
 
         # In[18]:
 
 
-        mars_hemisphere=Browser("chrome", headless=False)
+        # mars_hemisphere=Browser("chrome", headless=False)
         hem_url="https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
-        mars_hemisphere.visit(hem_url)
+        browser.visit(hem_url)
 
 
         # In[19]:
 
 
-        mars_hem_html = mars_hemisphere.html
+        mars_hem_html = browser.html
         hem_soup = BeautifulSoup(mars_hem_html, 'html.parser')
 
 
@@ -216,9 +222,9 @@ def scrape():
 
 
         for x in indiv_url_list:
-                mars_images=Browser("chrome", headless=False)
-                mars_hemisphere.visit(x)
-                indiv_html = mars_hemisphere.html
+                # mars_images=Browser("chrome", headless=False)
+                browser.visit(x)
+                indiv_html = browser.html
                 indiv_soup = BeautifulSoup(indiv_html, 'html.parser')
                 image=indiv_soup.find("a", text="Sample")
                 image_link=image.get("href")
